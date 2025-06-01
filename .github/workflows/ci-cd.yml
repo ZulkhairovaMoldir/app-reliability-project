@@ -45,11 +45,19 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install docker-compose -y
+      - name: Debug: Print current directory
+        run: pwd
       - name: Debug: List files in root
         run: ls -l
       - name: Debug: List files in app-reliability-project
         run: ls -l app-reliability-project
+      - name: Debug: Check docker-compose.yml exists
+        run: |
+          if [ ! -f app-reliability-project/docker-compose.yml ]; then
+            echo "docker-compose.yml not found!"
+            exit 1
+          fi
       - name: Deploy with Docker Compose
         working-directory: app-reliability-project
         run: |
-          docker-compose -f docker-compose.yml up -d --build
+          docker-compose up -d --build
