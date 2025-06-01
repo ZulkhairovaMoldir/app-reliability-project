@@ -46,5 +46,6 @@ jobs:
           sudo apt-get update
           sudo apt-get install docker-compose -y
       - name: Deploy with Docker Compose
+        working-directory: app-reliability-project
         run: |
-          docker-compose -f app-reliability-project/docker-compose.yml up -d --build
+          docker-compose -f docker-compose.yml up -d --build
