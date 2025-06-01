@@ -1,0 +1,45 @@
+groups:
+  - name: app-alerts
+    rules:
+      - alert: TooManyErrors
+        expr: |
+          sum(rate(http_request_errors_total[5m]))
+          /
+          sum(rate(http_request_duration_seconds_count[5m]))
+          > 0.001
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "HTTP error rate > 0.1%"
+      - alert: TargetDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Service is down"
+      - alert: HighErrorRate
+        expr: |
+          (1 - (
+            sum(rate(http_request_duration_seconds_count{status_code=~"2..|3.."}[5m]))
+            /
+            sum(rate(http_request_duration_seconds_count[5m]))
+          )) > 0.001
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "More than 0.1% of requests failed"
+      - alert: HighLatency
+        expr: |
+          (1 - (
+            sum(rate(http_request_duration_seconds_bucket{le="0.5"}[5m]))
+            /
+            sum(rate(http_request_duration_seconds_count[5m]))
+          )) > 0.01
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "More than 1% of requests exceed 0.5s"

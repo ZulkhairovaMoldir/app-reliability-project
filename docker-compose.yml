@@ -1,0 +1,48 @@
+version: '3.7'
+services:
+  app:
+    build: .
+    working_dir: /usr/src/app
+    volumes:
+      - ./:/usr/src/app
+    command: npm run start
+    ports:
+      - "3000:3000"
+  app2:
+    build: .
+    working_dir: /usr/src/app
+    volumes:
+      - ./:/usr/src/app
+    command: npm run start
+    ports:
+      - "3002:3000"
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./alert.rules.yml:/etc/prometheus/alert.rules.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    ports:
+      - "9090:9090"      
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    depends_on:
+      - prometheus
+    volumes:
+      - grafana-data:/var/lib/grafana
+  nginx:
+    image: nginx:latest
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - app
+      - app2
+volumes:
+  grafana-data:
