@@ -39,6 +39,12 @@ jobs:
     needs: test
     steps:
       - uses: actions/checkout@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Set up Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install docker-compose -y
       - name: Deploy with Docker Compose
         run: |
           docker-compose -f app-reliability-project/docker-compose.yml up -d --build
